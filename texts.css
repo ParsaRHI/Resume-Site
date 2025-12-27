@@ -1,0 +1,61 @@
+
+.mythic {
+
+  background: linear-gradient(
+    90deg,
+    #62ff4d,
+    #ffcc00,
+    #4dff88,
+    #deff4d,
+    #d8ff4d,
+    #62ff4d
+  );
+  background-size: 300% 100%;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: mythicShift 3s linear infinite;
+
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.25),
+    0 0 12px rgba(255, 180, 255, 0.35);
+}
+@keyframes mythicShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}
+.mythic2 {
+
+  background: linear-gradient(
+    90deg,
+    #ff4d4d,
+    #ffcc00,
+    #4dff88,
+    #4dd2ff,
+    #b84dff,
+    #ff4da6
+  );
+  background-size: 300% 100%;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: mythicShift 3s linear infinite;
+
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.25),
+    0 0 12px rgba(255, 180, 255, 0.35);
+}
+@keyframes mythicShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}

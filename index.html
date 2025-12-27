@@ -5,8 +5,9 @@
   <title>Parsa Rahimian | Resume</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="texts.css">
   <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
-  
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
 </head>
 <body>
@@ -16,28 +17,35 @@
   <main class="ui">
 
     <!-- PROFILE -->
-    <section class="window profile">
-      <div class="avatar-box">
+    <section class="window profile" data-aos="fade-down">
+      <div class="avatar-box" data-aos="fade-right">
+        <div class="fire-frame"></div> <!-- fire overlay -->
   <img class="avatar" src="assets/avatar.png" alt="Avatar">
   <div class="level">LV. 999+</div>
   <div class="status">
 
-    <div class="sprite"></div>
+    <!-- <div class="sprite"></div> -->
 
 </div>
 </div>
 
       <div>
-        <h1>Parsa Rahimian</h1>
+        <h1 class="hero-name">Parsa Rahimian</h1>
       
         <p class="subtitle">Game Developer / Designer</p>
            <!-- PIXEL HEARTS -->
     <div class="hearts">
-      <img src="assets/icons/HeartUpDown.gif" alt="Heart">
-      <img src="assets/icons/HeartUpDown.gif" alt="Heart">
-      <img src="assets/icons/HeartUpDown.gif" alt="Heart">
-      
-    </div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+  <div class="heart"></div>
+</div>
         <p>
           Focused on game systems, atmosphere, and player psychology.
           Pixel aesthetics, serious design.
@@ -101,7 +109,12 @@
     </section>
 
   </main>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
 <script src="scripts/potions.js"></script>
+<script src="scripts/hearts.js"></script>
 <script src="scripts/cursor.js"></script>
 </body>
 </html>
