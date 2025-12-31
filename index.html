@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="texts.css">
   <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
+    <link rel="icon" type="image/x-icon" href="assets/favicon2.png">
 </head>
 <body>
 <img id="cursor" src="assets/icons/sword.png">
@@ -18,35 +18,32 @@
 
     <!-- PROFILE -->
     <section class="window profile" data-aos="fade-down">
-      <div class="avatar-box" data-aos="fade-right">
-        <div class="fire-frame"></div> <!-- fire overlay -->
-  <img class="avatar" src="assets/avatar.png" alt="Avatar">
-  <div class="level">LV. 999+</div>
-  <div class="status">
+       <div class="avatar-box">
+        <div class="avatar-frame">
+           <div class="fire-frame"></div>
+           <img class="avatar" src="assets/avatar.png" alt="Avatar">
+         </div>
+          <div class="level">LV. 999+</div>
+       </div>
 
-    <!-- <div class="sprite"></div> -->
-
-</div>
-</div>
-
-      <div>
-        <h1 class="hero-name">Parsa Rahimian</h1>
+      <div class="text-header">
+        <h1 class="hero-name mythic">Parsa Rahimian</h1>
       
         <p class="subtitle">Game Developer / Designer</p>
            <!-- PIXEL HEARTS -->
-    <div class="hearts">
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
-  <div class="heart"></div>
+    <div class="hearts ">
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
+  <div class="heart clickable"></div>
 </div>
-        <p>
+        <p style="margin-top: 20px;">
           Focused on game systems, atmosphere, and player psychology.
           Pixel aesthetics, serious design.
         </p>
@@ -54,58 +51,132 @@
     </section>
 
     <!-- SKILLS -->
-    <section class="window">
-  <h2>Skills</h2>
+    <section class="window" data-aos="fade-up">
+  <h1 style="text-align: center;" class="mythic">Skills</h1>
 
   <div class="skills-grid">
     <div class="skill">
-      <img src="assets/icons/unity.png" alt="Unity">
-      <span>Unity</span>
+      <img src="assets/icons/UE5LogoHandMade.png" class="unreal-icon" alt="Unreal Engine">
+      <span>Unreal Engine</span>
     </div>
 
     <div class="skill">
-      <img src="assets/icons/csharp.png" alt="C#">
-      <span>C#</span>
+      <img src="assets/icons/CPPLogo.png" class="cpp-icon" alt="C++">
+      <span>C++</span>
     </div>
-
+ <div class="skill">
+      <img src="assets/icons/gear-export.png" class="gear-icon" alt="Optimization">
+      <span>Optimization</span>
+    </div>
     <div class="skill">
-      <img src="assets/icons/design.png" alt="Game Design">
+      <img src="assets/icons/gamecontroller.png" class="controller-icon" alt="Game Design">
       <span>Game Design</span>
     </div>
 
-    <div class="skill">
-      <img src="assets/icons/pixel.png" alt="Pixel Art">
-      <span>Pixel Art</span>
-    </div>
+   
   </div>
 </section>
 
 
-    <!-- EXPERIENCE -->
-    <section class="window">
-      <h2>Experience</h2>
-      <p>
-        Indie game development, prototyping, research-driven design,
-        experimental mechanics and narrative systems.
-      </p>
-    </section>
+<!-- EXPERIENCE -->
+<section class="window experience" data-aos="fade-up">
+  <h2 class="experience-title mythic">Experiences</h2>
 
-    <!-- PROJECTS -->
-    <section class="window">
-      <h2>Projects</h2>
+  <p class="intro">
+    Indie game development, prototyping, research-driven design,
+    experimental mechanics and narrative systems.
+  </p>
+  <hr class="divider">
+
+  <!-- First Card (GIF left) -->
+  <div class="card card-left" data-aos="fade-left">
+    <img src="assets/SurrenaGif.gif" alt="Surrena GIF" class="card-gif">
+    <div class="card-content">
+      <!--<h3>Surrena: The Forbidden Sword</h3>-->
+      <img src="assets/SURRENA.png" style="width: 400px;" alt="">
+      <p class="role level">Game Developer / Lead Programmer / Gameplay Designer</p>
+      <p>Designed combat systems with emphasis on player feedback and emotional pacing using UE5 Gameplay Ability System.</p>
+      <p>Collaborated with narrative team to integrate player choices into gameplay systems.</p>
+      <a href="https://www.instagram.com/p/DR45QYokZt0/" target="_blank" class="insta-link clickable" rel="noopener">
+        <img src="assets/InstagramLogo.png" alt="Instagram" class="insta-logo"> Instagram
+      </a>
+    </div>
+  </div>
+
+  <!-- Second Card (GIF right) -->
+  <div class="card card-right fade-right" data-aos="fade-right">
+    <img src="assets/ShooterGif.gif" alt="Another Game GIF" class="card-gif">
+    <div class="card-content">
+      <h1>Last Invention</h1>
+      <p class="role level">Solo Project (All by me)</p>
+      <p>Created immersive Shooter Gameplay Mechanics.</p>
+      <p>Implemented advanced mechanics for smooth player interaction.</p>
+      <a href="https://www.youtube.com/watch?v=KD36R1LphwE" target="_blank" class="youtube-link clickable" rel="noopener">
+        <img src="assets/youtubelogo.png" alt="Youtube" class="insta-logo"> Youtube
+      </a>
+    </div>
+  </div>
+
+  <!-- Third Card (GIF left again) 
+  <div class="card card-left fade-left" data-aos="fade-left">
+    <div class="card-gif-wrapper">
+<img src="assets/WarGame.gif" alt="Third Game GIF" class="card-gif">
+
+    </div>
+    
+    <div class="card-content">
+      <h3>WarDays</h3>
+      <p class="role level">Lead Designer / Programmer</p>
+      <p>Made in Just 2 Days for a game jam by 2 people!</p>
+      <p>We won second place in the competition with this game.</p>
+      
+    </div>
+  </div>-->
+  <a href="https://parsarh.itch.io/" class="more-button clickable" data-aos="fade-up" target="_blank" rel="noopener">More <span>→</span> itch.io</a>
+
+</section>
+
+    <!-- Learnings -->
+    <section class="window" data-aos="fade-up">
+      <h2>Learnings</h2>
       <ul>
         <li>
-          <strong>Shattered Crown</strong><br>
-          Linear narrative game with stylized characters and dark themes.
+         Unreal Engine 5 - Gameplay Ability System - Top Down RPG
+        </li>
+        <li>
+         Udemy - Unreal Engine Blueprints Game Optimization
+        </li>
+        <li>
+         Udemy - How To Make A Melee Combat System In Unreal Engine 5
+        </li>
+        <li>
+          Udemy - Unreal Engine 4 Create Your Own First-Person 
+        </li>
+        <li>
+          آنریل آکادمی - دوره ساخت بازی بتل رویال
+        </li>
+        <li>
+          مجتمع فنی تهران - دوره مقدماتی سی پلاس پلاس 
+        </li>
+      </ul>
+      <h2>Trophies</h2>
+      <ul>
+        <li>
+        کسب مقام اول در بخش بازی سازی اندروید در مرحله استانی ششمین رویداد سراسری تولید محتوای دیجیتال در استان خراسان رضوی
+        </li>
+        <li>
+        کسب مقام دوم در سومین رویداد تولید محتوای دیجیتال منطفه ۵ در حوزه بازی موبایل
         </li>
       </ul>
     </section>
 
     <!-- CONTACT -->
-    <section class="window">
-      <h2>Contact</h2>
-      <p>Email: your@email.com</p>
-      <p>GitHub: github.com/yourname</p>
+    <section class="window" data-aos="fade-up">
+      <h1 class="level">Contact:</h1>
+      <p class="mythic" style="text-align: center;">Telegram: <a href="https://t.me/ParsaRahimian" target="_blank" rel="noopener" class="clickable" style="color: aqua;">@ParsaRHI</a></p>
+      <p class="mythic" style="text-align: center;">Discord: parsarh_</p>
+      <p class="mythic" style="text-align: center;">Email: parsarahimian@outlook.com</p>
+      <p class="mythic" style="text-align: center;">Steam: <a href="https://steamcommunity.com/id/ParsaRHI/" target="_blank" rel="noopener" class="clickable" style="color: aqua;"> ParsaRH</a></p>
     </section>
 
   </main>
@@ -116,5 +187,6 @@
 <script src="scripts/potions.js"></script>
 <script src="scripts/hearts.js"></script>
 <script src="scripts/cursor.js"></script>
+
 </body>
 </html>

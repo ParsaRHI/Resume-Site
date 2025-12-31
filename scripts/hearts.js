@@ -42,7 +42,6 @@ function checkAllDead() {
 
 
 
-
 const gap = 4; // px
 const heartWidth = 32; // px
 
@@ -64,6 +63,8 @@ window.addEventListener('load', resizeHearts);
 // Update dynamically on resize
 window.addEventListener('resize', resizeHearts);
 function spawnExplosion(heart) {
+  const cursor = document.getElementById('cursor');
+  cursor.classList.remove('glow');
   const rect = heart.getBoundingClientRect();
   const parentRect = heart.parentElement.getBoundingClientRect();
 

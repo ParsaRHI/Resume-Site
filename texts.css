@@ -17,9 +17,7 @@
 
   animation: mythicShift 3s linear infinite;
 
-  text-shadow:
-    0 0 6px rgba(255, 255, 255, 0.25),
-    0 0 12px rgba(255, 180, 255, 0.35);
+ 
 }
 @keyframes mythicShift {
   0% {

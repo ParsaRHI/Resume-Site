@@ -3,6 +3,8 @@
 ------------------- */
 * {
   box-sizing: border-box;
+  cursor: none !important;
+
 }
 
 img, canvas {
@@ -36,6 +38,7 @@ body {
   color: var(--text);
   font-family: Inter, system-ui, sans-serif;
   line-height: 1.6;
+  
 }
 
 h1, h2 {
@@ -67,6 +70,7 @@ h1, h2 {
   padding: var(--unit);
   border: 4px solid var(--border);
   box-sizing: border-box;
+  
 }
 
 /* -------------------
@@ -78,23 +82,39 @@ h1, h2 {
   grid-template-columns: auto 1fr;
   gap: var(--unit);
   align-items: center;
+  row-gap: 24px;
 }
 
 .avatar-box {
+  position: relative; /* positioning context for overlay */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
-.avatar {
-  width: clamp(160px, 25vw, 260px);
-  height: auto;
-  object-fit: contain;
-  z-index: 1;
+.avatar-frame {
+  position: relative;
+  width: clamp(220px, 60vw, 320px);
+  aspect-ratio: 1 / 1; /* keeps it square */
+  margin-bottom: 16px;
+}
+/* Fire frame overlay */
+.fire-frame {
+  position: absolute;
+  inset: -12%; /* frame slightly larger than avatar */
+  background: url('assets/fire-frame.png') no-repeat center / contain;
+  pointer-events: none;
+  z-index: 2;
 }
 
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+  position: relative;
+}
 .level {
-  margin-top: 6px;
+  margin-top: 60px;
   font-size: clamp(14px, 2vw, 20px);
   text-align: center;
 }
@@ -103,6 +123,7 @@ h1, h2 {
     grid-template-columns: 1fr;   /* stack */
     justify-items: center;
     text-align: center;
+    row-gap: 1px;
   }
 
   .avatar-box {
@@ -112,9 +133,8 @@ h1, h2 {
 
   .avatar {
     width: 100%;                 /* fill window */
-    max-width: 300px;            /* sanity limit */
+    max-width: none;          /* sanity limit */
   }
-
   .hearts {
     justify-content: center;
   }
@@ -138,8 +158,11 @@ h1, h2 {
 }
 
 .skill img {
-  width: var(--skill-size);
+  width: auto;
   height: var(--skill-size);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  transform: scale(1);
 }
 
 .skill span {
@@ -269,11 +292,11 @@ body {
    HEARTS
 ------------------- */
 .hearts {
+  margin-top: 12px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 10px;
-  overflow: hidden;
   width: 100%;
   position: relative;
 }
@@ -286,6 +309,7 @@ body {
   animation: wave 3s infinite;
   image-rendering: pixelated;
   transition: filter 0.2s, opacity 0.2s;
+  z-index: 997;
 }
 
 .heart.dead {
@@ -319,25 +343,471 @@ body {
   transform-origin: center;
   z-index: 998;
 }
-.avatar-box {
-  position: relative; /* positioning context for overlay */
-  display: flex;
+.hero-name {
+  display: inline-block; /* hover only where the text actually is */
+  pointer-events: auto;
+}
+.text-header {
+  margin-left: 0;
+}
+
+@media (min-width: 1024px) {
+  .text-header {
+    margin-left: 22px;
+  }
+}
+.text-header {
+  display: inline-block;
   flex-direction: column;
+  gap: 4px;
+}
+.text-header h1,
+.text-header p {
+  margin: 0;
+}
+.social-link {
+  display: inline-flex;      /* text + icon in one line */
+  align-items: center;       /* vertically center */
+  gap: 6px;                  /* space between icon and text */
+  text-decoration: none;     /* remove underline */
+  color: inherit;            /* inherit parent text color */
+  font-weight: 500;          /* optional: slightly bold */
+  transition: opacity 0.2s ease;
+  
+}
+
+.social-link img {
+  width: 20px;               /* control icon size */
+  height: 20px;
+  object-fit: contain;
+}
+
+.social-link:hover {
+  opacity: 0.8;              /* subtle hover effect */
+}
+#cursor.glow {
+  animation: fireGlow 1s infinite linear alternate;
+}
+
+@keyframes fireGlow {
+  0% {
+    transform: rotate(0deg);
+    filter: drop-shadow(0 0 4px rgba(255,160,0,0.6))
+           drop-shadow(0 0 6px rgba(255,100,0,0.6));
+  }
+  25% {
+    filter: drop-shadow(0 0 6px rgba(255,180,0,0.7))
+           drop-shadow(0 0 8px rgba(255,120,0,0.7));
+  }
+  50% {
+    transform: rotate(2deg);
+    filter: drop-shadow(0 0 8px rgba(255,200,0,0.9))
+           drop-shadow(0 0 10px rgba(255,140,0,0.9));
+  }
+  75% {
+    filter: drop-shadow(0 0 6px rgba(255,180,0,0.7))
+           drop-shadow(0 0 8px rgba(255,120,0,0.7));
+  }
+  100% {
+    transform: rotate(0deg);
+    filter: drop-shadow(0 0 4px rgba(255,160,0,0.6))
+           drop-shadow(0 0 6px rgba(255,100,0,0.6));
+  }
+}
+/* =========================
+   EXPERIENCE SECTION
+========================= */
+
+.experience {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 24px;
+  color: #eaeaea;
+}
+
+
+
+.experience .intro {
+  max-width: 650px;
+  font-size: 1.05rem;
+  opacity: 0.85;
+  line-height: 1.7;
+}
+
+.divider {
+  margin: 32px 0 32px;
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #555, transparent);
+}
+
+/* =========================
+   CARD BASE
+========================= */
+
+.card {
+  display: flex;
   align-items: center;
+  gap: 42px;
+  margin-bottom: 32px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  padding: 32px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  overflow: hidden; /* important */
 }
-
-/* Fire frame overlay */
-.fire-frame {
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+}
+/* RGB border layer */
+.card::before {
+  content: "";
   position: absolute;
-  top: -10%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-
-  /* Fire frame image */
-  background: url('assets/fire-frame.png') no-repeat center/cover;
-
-  /* Optional animation: flickering fire */
-  pointer-events: none; /* so clicks pass through to avatar if needed */
+  inset: 0;
+  padding: 2px; /* border thickness */
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+      #ff004c,
+      #ff7a00,
+      #00ff85,
+      #00c8ff,
+      #7a5cff,
+      #ff004c
+  );
+  background-size: 300% 300%;
+  animation: rgb-border 6s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
 }
+
+@keyframes rgb-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* =========================
+   LEFT / RIGHT VARIANTS
+========================= */
+
+.card-left {
+  flex-direction: row;
+}
+
+.card-right {
+  flex-direction: row-reverse;
+}
+
+/* =========================
+   GIF
+========================= */
+
+.card-gif {
+  width: 380px;
+  max-width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.card-content {
+  flex: 1;
+}
+
+.card-content h3 {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+.role {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
+}
+
+.card-content p {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+/* =========================
+   INSTAGRAM LINK
+========================= */
+
+.insta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ff006a, #ff7a18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.insta-link:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 0, 106, 0.4);
+}
+.youtube-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #E52D27, #B31217);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.youtube-link:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 0, 0, 0.4);
+}
+.insta-logo {
+  width: 20px;
+  height: 20px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .card-right {
+    flex-direction: column;
+  }
+
+  .card-gif {
+    width: 100%;
+  }
+}
+/* =========================
+   RESPONSIVE FIX
+========================= */
+
+@media (max-width: 1024px) {
+  .card {
+    gap: 24px;
+  }
+
+  .card-gif {
+    width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card,
+  .card-right {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .card-gif {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .card-content {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 18px;
+  }
+
+  .card-content h3 {
+    font-size: 1.4rem;
+  }
+
+  .card-content p {
+    font-size: 0.95rem;
+  }
+}
+/* =========================
+   ROTATING GEAR ICON
+========================= */
+
+.gear-icon {
+  width: 42px;
+  height: 42px;
+  animation: gear-rotate 4s linear infinite;
+  transform-origin: center;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.15));
+}
+
+/* Rotation keyframes */
+@keyframes gear-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.unreal-icon {
+  width: 42px;
+  height: 42px;
+  animation: unreal-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes unreal-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.08);
+    filter: brightness(1.25);
+  }
+}
+.cpp-icon {
+  width: 42px;
+  height: 42px;
+  animation: cpp-blink 1.8s steps(1) infinite;
+}
+
+@keyframes cpp-blink {
+  0%, 45% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0.35;
+  }
+}
+.controller-icon {
+  width: 42px;
+  height: 42px;
+  animation: controller-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes controller-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.experience-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+}
+
+.experience-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #fff, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: title-reveal 1.2s ease forwards;
+}
+
+@keyframes title-reveal {
+  to {
+    transform: scaleX(1);
+  }
+}
+.more-button {
+  position: relative;
+  display: inline-block;
+  margin: 32px auto 0; /* space above, centered horizontally */
+  padding: 12px 32px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(0,0,0,0.15);
+  text-decoration: none;
+  border-radius: 25px;
+  text-align: center;
+
+  /* make it center as a block */
+  display: block;
+  width: max-content;
+
+  /* hover effect */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.more-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(255,0,106,0.4);
+}
+.more-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* border thickness */
+  border-radius: 25px;
+  background: linear-gradient(
+    90deg,
+    #ff004c,
+    #ff7a00,
+    #ffe600,
+    #00ff85,
+    #00c8ff,
+    #7a5cff,
+    #ff004c
+  );
+  background-size: 300% 300%;
+  animation: rgb-border 6s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes rgb-border {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+.more-button:hover::before {
+  filter: brightness(1.3);
+}
+
