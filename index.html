@@ -9,6 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="icon" type="image/x-icon" href="assets/favicon2.png">
+    <!-- Highlight.js CSS (IDE-like dark theme) -->
+     <link href="prism.css" rel="stylesheet" />
+
 </head>
 <body>
 <img id="cursor" src="assets/icons/sword.png">
@@ -20,7 +23,7 @@
     <section class="window profile" data-aos="fade-down">
        <div class="avatar-box">
         <div class="avatar-frame">
-           <div class="fire-frame"></div>
+           <div class="fire-frame" loading="lazy"></div>
            <img class="avatar" src="assets/avatar.png" alt="Avatar">
          </div>
           <div class="level">LV. 999+</div>
@@ -29,9 +32,9 @@
       <div class="text-header">
         <h1 class="hero-name mythic">Parsa Rahimian</h1>
       
-        <p class="subtitle">Game Developer / Designer</p>
+        <p class="subtitle">Gameplay Programmer & Technical Designer</p>
            <!-- PIXEL HEARTS -->
-    <div class="hearts ">
+    <div class="hearts " loading="lazy">
   <div class="heart clickable"></div>
   <div class="heart clickable"></div>
   <div class="heart clickable"></div>
@@ -51,7 +54,7 @@
 
     <!-- SKILLS -->
     <section class="window" data-aos="fade-up">
-  <h1 style="text-align: center;" class="mythic">Skills</h1>
+  <h1 style="text-align: center;" class="mythic">Expertise</h1>
 
   <div class="skills-grid">
     <div class="skill">
@@ -69,7 +72,7 @@
     </div>
     <div class="skill">
       <img src="assets/icons/gamecontroller.png" class="controller-icon" alt="Game Design">
-      <span>Game Design</span>
+      <span>Technical Game Design</span>
     </div>
 
    
@@ -79,7 +82,7 @@
 
 <!-- EXPERIENCE -->
 <section class="window experience" data-aos="fade-up">
-  <h2 class="experience-title mythic">Experiences</h2>
+  <h2 class="experience-title mythic">Projects</h2>
 
   <p class="intro">
     Indie game development, prototyping, research-driven design,
@@ -89,7 +92,513 @@
 
   <!-- First Card (GIF left) -->
   <div class="card card-left" data-aos="fade-left">
-    <img src="assets/SurrenaGif.gif" alt="Surrena GIF" class="card-gif">
+
+
+
+
+
+     <div class="media-slider">
+  
+
+  <div class="media-panels">
+    <div class="media-panel active" id="gif-1">
+      <img src="assets/SurrenaGif.gif" class="card-gif" alt="Surrena's GIF">
+    </div>
+    <div class="media-panel" id="gif-1" data-label="Surrena's Level Up System">
+      <img src="assets/SurenaLevelUp.gif" loading="lazy" class="card-gif" alt="Surrena's Level Up System">
+    </div>
+   <div class="media-panel" id="cpp-1" data-label="Surrrena's GameplayAbilitySystemComponent.cpp">
+  <pre><code class="language-cpp">
+// Copyright Parsa Rahimian
+
+#include "AbilitySystem/SurrenaAbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "SurrenaGameplayTags.h"
+#include "AbilitySystem/SurrenaAbilitySystemLibrary.h"
+#include "AbilitySystem/Abilities/SurrenaGameplayAbility.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
+#include "Interaction/PlayerInterface.h"
+
+void USurrenaAbilitySystemComponent::AbilityActorInfoSet()
+{
+    // Bind delegate to detect when a gameplay effect is applied to self
+    OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &USurrenaAbilitySystemComponent::ClientEffectApplied);
+
+    const FSurrenaGameplayTags& GameplayTags = FSurrenaGameplayTags::Get();
+    // Could initialize or cache tags here if needed
+}
+
+// Add abilities to the character on startup
+void USurrenaAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
+{
+    for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+    {
+        int32 PlayerLevel{1};
+
+        // Get player level if actor implements the PlayerInterface
+        if (GetAvatarActor()->Implements<UPlayerInterface>()) {
+            PlayerLevel = IPlayerInterface::Execute_GetPlayerLevel(GetAvatarActor());
+        }
+
+        // Create ability spec with level
+        FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, PlayerLevel);
+
+        // If ability is a SurrenaGameplayAbility, assign tags
+        if (const USurrenaGameplayAbility* SurrenaAbility = Cast<USurrenaGameplayAbility>(AbilitySpec.Ability)) 
+        {
+            AbilitySpec.DynamicAbilityTags.AddTag(SurrenaAbility->StartupInputTag);
+            AbilitySpec.DynamicAbilityTags.AddTag(FSurrenaGameplayTags::Get().Abilities_Status_Equipped);
+            GiveAbility(AbilitySpec);
+        }
+    }
+
+    bStartUpAbilitiesGiven = true;
+    AbilitiesGivenDelegate.Broadcast();
+}
+
+// Add passive abilities that activate once on startup
+void USurrenaAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities)
+{
+    for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupPassiveAbilities)
+    {
+        FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+        GiveAbilityAndActivateOnce(AbilitySpec);
+    }
+}
+
+// Server-side function to spend a spell point on a specific ability
+void USurrenaAbilitySystemComponent::ServerSpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)
+{
+    if (FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        if (GetAvatarActor()->Implements<UPlayerInterface>())
+        {
+            IPlayerInterface::Execute_AddToSpellPoints(GetAvatarActor(), -1);
+        }
+
+        const FSurrenaGameplayTags GameplayTags = FSurrenaGameplayTags::Get();
+        FGameplayTag Status = GetStatusFromSpec(*AbilitySpec);
+
+        // Upgrade ability if eligible
+        if (Status.MatchesTagExact(GameplayTags.Abilities_Status_Eligible))
+        {
+            AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Abilities_Status_Eligible);
+            AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Unlocked);
+            Status = GameplayTags.Abilities_Status_Unlocked;
+        }
+        // Level up ability if already equipped or unlocked
+        else if (Status.MatchesTagExact(GameplayTags.Abilities_Status_Equipped) || Status.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
+        {
+            AbilitySpec->Level += 1;
+        }
+
+        ClientUpdateAbilityStatus(AbilityTag, Status, AbilitySpec->Level);
+        MarkAbilitySpecDirty(*AbilitySpec);
+    }
+}
+
+// Helper: Get ability status from a tag
+FGameplayTag USurrenaAbilitySystemComponent::GetStatusFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+    if (const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        return GetStatusFromSpec(*Spec);
+    }
+    return FGameplayTag();
+}
+
+// Get the input tag (slot) associated with a spec
+FGameplayTag USurrenaAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+    for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+    {
+        if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+        {
+            return Tag;
+        }
+    }
+    return FGameplayTag();
+}
+
+// Get the input tag from an ability tag
+FGameplayTag USurrenaAbilitySystemComponent::GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+    if (const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        return GetInputTagFromSpec(*Spec);
+    }
+    return FGameplayTag();
+}
+
+// Called when an input tag (like a hotkey) is held
+void USurrenaAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
+{
+    if (!InputTag.IsValid()) { return; }
+
+    for (auto ActivatableAbility : GetActivatableAbilities()) {
+        if (ActivatableAbility.DynamicAbilityTags.HasTagExact(InputTag)) {
+            AbilitySpecInputPressed(ActivatableAbility);
+            if (!ActivatableAbility.IsActive()) {
+                TryActivateAbility(ActivatableAbility.Handle);
+            }
+        }
+    }
+}
+
+// Equip an ability to a slot
+void USurrenaAbilitySystemComponent::ServerEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& Slot)
+{
+    if (FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        const FSurrenaGameplayTags& GameplayTags = FSurrenaGameplayTags::Get();
+        const FGameplayTag& PrevSlot = GetInputTagFromSpec(*AbilitySpec);
+        const FGameplayTag& Status = GetStatusFromSpec(*AbilitySpec);
+
+        const bool bStatusValid = Status == GameplayTags.Abilities_Status_Equipped || Status == GameplayTags.Abilities_Status_Unlocked;
+        if (bStatusValid)
+        {
+            // Remove this slot from other abilities
+            ClearAbilitiesOfSlot(Slot);
+            // Clear this ability's previous slot
+            ClearSlot(AbilitySpec);
+            // Assign new slot
+            AbilitySpec->DynamicAbilityTags.AddTag(Slot);
+            if (Status.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked))
+            {
+                AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Abilities_Status_Unlocked);
+                AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Equipped);
+            }
+            MarkAbilitySpecDirty(*AbilitySpec);
+        }
+        ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, Slot, PrevSlot);
+    }
+}
+
+// Notify client that an ability was equipped
+void USurrenaAbilitySystemComponent::ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot)
+{
+    AbilityEquipped.Broadcast(AbilityTag, Status, Slot, PreviousSlot);
+}
+
+// Clear the input slot of a spec
+void USurrenaAbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* Spec)
+{
+    const FGameplayTag Slot = GetInputTagFromSpec(*Spec);
+    Spec->DynamicAbilityTags.RemoveTag(Slot);
+    MarkAbilitySpecDirty(*Spec);
+}
+
+// Clear all abilities assigned to a specific slot
+void USurrenaAbilitySystemComponent::ClearAbilitiesOfSlot(const FGameplayTag& Slot)
+{
+    FScopedAbilityListLock ActiveScopeLock(*this);
+    for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+    {
+        if (AbilityHasSlot(&Spec, Slot))
+        {
+            ClearSlot(&Spec);
+        }
+    }
+}
+
+// Check if a spec has a slot
+bool USurrenaAbilitySystemComponent::AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot)
+{
+    for (FGameplayTag Tag : Spec->DynamicAbilityTags)
+    {
+        if (Tag.MatchesTagExact(Slot))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Called when input tag is released
+void USurrenaAbilitySystemComponent::AbilityInputTagRelease(const FGameplayTag& InputTag)
+{
+    if (!InputTag.IsValid()) { return; }
+
+    for (FGameplayAbilitySpec ActivatableAbility : GetActivatableAbilities()) {
+        if (ActivatableAbility.DynamicAbilityTags.HasTagExact(InputTag)) {
+            AbilitySpecInputReleased(ActivatableAbility);
+        }
+    }
+}
+
+// Get spec from ability tag
+FGameplayAbilitySpec* USurrenaAbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+    FScopedAbilityListLock ActiveScopeLoc(*this);
+    for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+    {
+        for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+        {
+            if (Tag.MatchesTag(AbilityTag))
+            {
+                return &AbilitySpec;
+            }
+        }
+    }
+    return nullptr;
+}
+
+// Update abilities based on player level
+void USurrenaAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
+{
+    UAbilityInfo* AbilityInfo = USurrenaAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+    for (const FSurrenaAbilityInfo& Info : AbilityInfo->AbilityInformation)
+    {
+        if (!Info.AbilityTag.IsValid()) continue;
+        if (Level < Info.LevelRequirement) continue;
+        if (GetSpecFromAbilityTag(Info.AbilityTag) == nullptr)
+        {
+            FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.Ability, 1);
+            AbilitySpec.DynamicAbilityTags.AddTag(FSurrenaGameplayTags::Get().Abilities_Status_Eligible);
+            GiveAbility(AbilitySpec);
+            MarkAbilitySpecDirty(AbilitySpec);
+            ClientUpdateAbilityStatus(Info.AbilityTag, FSurrenaGameplayTags::Get().Abilities_Status_Eligible, 1);
+        }
+    }
+}
+
+// Notify client about ability status changes
+void USurrenaAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
+{
+    AbilityStatusChanged.Broadcast(AbilityTag, StatusTag, AbilityLevel);
+}
+
+// Iterate over all activatable abilities
+void USurrenaAbilitySystemComponent::ForEachAbility(const FForEachAbility& Delegate)
+{
+    FScopedAbilityListLock ActiveScopeLock(*this);
+    for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+    {
+        if (!Delegate.ExecuteIfBound(AbilitySpec)) 
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed To Execute Delegate In %hs"), __FUNCTION__);
+        }
+    }
+}
+
+// Get main ability tag from a spec
+FGameplayTag USurrenaAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+    if (AbilitySpec.Ability) 
+    {
+        for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags) 
+        {
+            if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))) )
+            {
+                return Tag;
+            }
+        }
+    }
+    return FGameplayTag();
+}
+
+// Get status tag from a spec
+FGameplayTag USurrenaAbilitySystemComponent::GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+    for (FGameplayTag StatusTag : AbilitySpec.DynamicAbilityTags) {
+        if (StatusTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status")))) {
+            return StatusTag;
+        }
+    }
+    return FGameplayTag();
+}
+
+// Replication hook for activated abilities
+void USurrenaAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+    Super::OnRep_ActivateAbilities();
+
+    if (!bStartUpAbilitiesGiven)
+    {
+        bStartUpAbilitiesGiven = true;
+        AbilitiesGivenDelegate.Broadcast();
+    }
+}
+
+// Client-side callback when a gameplay effect is applied
+void USurrenaAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
+    const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+{
+    FGameplayTagContainer TagContainer;
+    EffectSpec.GetAllAssetTags(TagContainer);
+    EffectAssetTags.Broadcast(TagContainer);
+}
+
+// Get ability descriptions for UI or tooltips
+bool USurrenaAbilitySystemComponent::GetDescriptionsByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription)
+{
+    if (const FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+    {
+        if (USurrenaGameplayAbility* SurrenaAbility = Cast<USurrenaGameplayAbility>(AbilitySpec->Ability))
+        {
+            OutDescription = SurrenaAbility->GetDescription(AbilitySpec->Level);
+            OutNextLevelDescription = SurrenaAbility->GetNextLevelDescription(AbilitySpec->Level + 1);
+            return true;
+        }
+    }
+
+    const UAbilityInfo* AbilityInfo = USurrenaAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+    if (!AbilityTag.IsValid() || AbilityTag.MatchesTagExact(FSurrenaGameplayTags::Get().Abilities_None))
+    {
+        OutDescription = FString();
+    }
+    else
+    {
+        OutDescription = USurrenaGameplayAbility::GetLockedDescription(AbilityInfo->FindAbilityInfoForTag(AbilityTag).LevelRequirement);
+    }
+    OutNextLevelDescription = FString();
+    return false;
+}
+
+  </code></pre>
+</div>
+<div class="media-panel" id="cpp-1" data-label="Surrena's EffectActor.cpp">
+  <pre><code class="language-cpp">
+// Copyright Parsa Rahimian
+#include "Actor/SurrenaEffectActor.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+
+// Sets default values
+ASurrenaEffectActor::ASurrenaEffectActor()
+{
+    // Disable Tick by default to improve performance
+    PrimaryActorTick.bCanEverTick = false;
+
+    // Create a root scene component
+    SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
+}
+
+// Called when the game starts or when spawned
+void ASurrenaEffectActor::BeginPlay()
+{
+    Super::BeginPlay();
+}
+
+// Apply a specific gameplay effect to a target actor
+void ASurrenaEffectActor::ApplyEffectToTarget(
+    AActor* TargetActor,
+    const FEffectType& Effect
+)
+{
+    // Get the target's Ability System Component
+    UAbilitySystemComponent* TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+    if (TargetAbilitySystemComponent == nullptr) return;
+
+    // Ensure the GameplayEffect is valid
+    check(Effect.GameplayEffect);
+
+    // Create an effect context with this actor as the source
+    FGameplayEffectContextHandle EffectContextHandle = TargetAbilitySystemComponent->MakeEffectContext();
+    EffectContextHandle.AddSourceObject(this);
+
+    // Create the GameplayEffectSpec with actor level
+    const FGameplayEffectSpecHandle EffectSpecHandle = TargetAbilitySystemComponent->MakeOutgoingSpec(
+        Effect.GameplayEffect,
+        ActorLevel,
+        EffectContextHandle
+    );
+
+    // Apply the effect to the target
+    const FActiveGameplayEffectHandle ActiveEffectHandle = TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
+        *EffectSpecHandle.Data.Get()
+    );
+
+    // If the effect is infinite and should be removed on end overlap, track it
+    if (EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite)
+    {
+        if (Effect.RemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+        {
+            ActiveEffectHandles.Add(ActiveEffectHandle, TargetAbilitySystemComponent);
+        }
+    }
+}
+
+// Called when an actor begins overlap
+void ASurrenaEffectActor::OnOverlap(AActor* TargetActor)
+{
+    for (const FEffectType& Effect : Effects)
+    {
+        // Apply effects that trigger on overlap
+        if (Effect.ApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+        {
+            ApplyEffectToTarget(TargetActor, Effect);
+        }
+    }
+}
+
+// Called when an actor ends overlap
+void ASurrenaEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+    for (const FEffectType& Effect : Effects)
+    {
+        // Apply effects that trigger on end overlap
+        if (Effect.ApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+        {
+            ApplyEffectToTarget(TargetActor, Effect);
+        }
+
+        // Handle removal of infinite duration effects
+        if (Effect.GameplayEffect.GetDefaultObject()->DurationPolicy == EGameplayEffectDurationType::Infinite)
+        {
+            if (Effect.RemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+            {
+                UAbilitySystemComponent* TargetAbilitySystemComponent =
+                    UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+
+                if (!IsValid(TargetAbilitySystemComponent)) return;
+
+                // Collect handles to remove
+                TArray<FActiveGameplayEffectHandle> HandlesToRemove;
+                for (TTuple<FActiveGameplayEffectHandle, UAbilitySystemComponent*> HandlePair : ActiveEffectHandles)
+                {
+                    if (TargetAbilitySystemComponent == HandlePair.Value)
+                    {
+                        TargetAbilitySystemComponent->RemoveActiveGameplayEffect(HandlePair.Key, 1);
+                        HandlesToRemove.Add(HandlePair.Key);
+                    }
+                }
+
+                // Remove handles from tracking map
+                for (FActiveGameplayEffectHandle& Handle : HandlesToRemove)
+                {
+                    ActiveEffectHandles.FindAndRemoveChecked(Handle);
+                }
+            }
+        }
+    }
+}
+
+  </code></pre>
+</div>
+    <div class="media-panel" id="bp-1" data-label="Surrena's Ladder System Debug Blueprints">
+      <iframe src="https://blueprintue.com/render/s_-s9d2o/" scrolling="no" allowfullscreen></iframe>
+    </div>
+    <!-- Navigation arrows -->
+    <div class="slider-arrow left">&#10094;</div>
+    <div class="slider-arrow right">&#10095;</div>
+  </div>
+    
+  <!-- Circle slider / navigation -->
+    <div class="slider-dots">
+      <!-- Dots will be generated dynamically via JS -->
+    </div>
+
+    <!-- Slide label text -->
+    <div class="slide-label" style="text-align: center;"></div>
+  </div>
+
+
+
+
+
+
+
     <div class="card-content">
       <!--<h3>Surrena: The Forbidden Sword</h3>-->
       <img src="assets/SURRENA.png" style="width: 400px;" alt="">
@@ -104,7 +613,44 @@
 
   <!-- Second Card (GIF right) -->
   <div class="card card-right fade-right" data-aos="fade-right">
-    <img src="assets/ShooterGif.gif" alt="Another Game GIF" class="card-gif">
+
+
+    <div class="media-slider">
+  
+
+  <div class="media-panels">
+    <div class="media-panel active" id="gif-1">
+      <img src="assets/ShooterGif.gif" class="card-gif" alt="Shooter GIF">
+    </div>
+
+<div class="media-panel" id="bp-1" data-label="BP_Player Event Graph">
+      <iframe src="https://blueprintue.com/render/kzymkj_y/" scrolling="no" allowfullscreen></iframe>
+    </div>
+
+   <div class="media-panel" id="bp-1" data-label="Hide&Show WeaponMesh">
+      <iframe src="https://blueprintue.com/render/rdrhkxcp/" scrolling="no" allowfullscreen></iframe>
+    </div>
+<div class="media-panel" id="bp-1" data-label="Ammo Pickup">
+      <iframe src="https://blueprintue.com/render/ju_zfyeb/" scrolling="no" allowfullscreen></iframe>
+    </div>
+    
+    <!-- Navigation arrows -->
+    <div class="slider-arrow left">&#10094;</div>
+    <div class="slider-arrow right">&#10095;</div>
+  </div>
+    
+  <!-- Circle slider / navigation -->
+    <div class="slider-dots">
+      <!-- Dots will be generated dynamically via JS -->
+    </div>
+
+    <!-- Slide label text -->
+    <div class="slide-label" style="text-align: center;"></div>
+  </div>
+
+
+
+
     <div class="card-content">
       <h1>Last Invention</h1>
       <p class="role level">Solo Project (All by me)</p>
@@ -185,10 +731,12 @@
         <div class="skill-name">UE~Blueprints</div>
         <div class="progress-bar"><div class="progress-fill" style="width:90%;"></div></div>
       </div>
+
       <div class="skill">
-        <div class="skill-name">Systems Design</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:85%;"></div></div>
+        <div class="skill-name">UE~C++</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div>
       </div>
+      
       <div class="skill">
         <div class="skill-name">HTML/CSS/JS</div>
         <div class="progress-bar"><div class="progress-fill" style="width:85%;"></div></div>
@@ -196,15 +744,16 @@
     </div>
     
     <!-- Right Column -->
-    <div class="skills-column">
-      <div class="skill">
-        <div class="skill-name">UE~C++</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:80%;"></div></div>
+           <div class="skills-column">
+    <div class="skill">
+        <div class="skill-name">Systems Design</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:90%;"></div></div>
       </div>
       <div class="skill">
         <div class="skill-name">Optimization</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:85%;"></div></div>
       </div>
+      
       <div class="skill">
         <div class="skill-name">3D/2D Tools (Blender, ZBrush, Aseprite)</div>
         <div class="progress-bar"><div class="progress-fill" style="width:65%;"></div></div>
@@ -219,7 +768,7 @@
 
     <!-- CONTACT -->
     <section class="window" data-aos="fade-up">
-      <h1 class="level">Contact:</h1>
+      <h1 class="level">Contact Me:</h1>
       <p class="mythic" style="text-align: center;">Telegram: <a href="https://t.me/ParsaRahimian" target="_blank" rel="noopener" class="clickable" style="color: aqua;">@ParsaRahimian</a></p>
       <p class="mythic" style="text-align: center;">Discord: parsarh_</p>
       <p class="mythic" style="text-align: center;">Email: parsarahimian@outlook.com</p>
@@ -234,6 +783,6 @@
 <script src="scripts/potions.js"></script>
 <script src="scripts/hearts.js"></script>
 <script src="scripts/cursor.js"></script>
-
+<script src="prism.js"></script>
 </body>
 </html>
